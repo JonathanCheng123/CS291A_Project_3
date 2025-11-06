@@ -4,8 +4,16 @@
 # model remove the "{}" from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
-# column: value
-#
-two: {}
-# column: value
+one:
+  user: one # references a user fixture
+  conversation: one # references a conversation fixture
+  content: "Hello"
+  sender_role: "initiator"
+  is_read: false
+
+two:
+  user: one
+  conversation: one
+  content: "Hi there"
+  sender_role: "expert"
+  is_read: false

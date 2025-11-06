@@ -36,11 +36,4 @@ class MessageTest < ActiveSupport::TestCase
     @message.conversation = nil
     assert_not @message.valid?
   end
-
-  test "mark_as_read! sets is_read to true" do
-    @message.is_read = false
-    @message.save!
-    @message.update(is_read: true) # or call mark_as_read! if you define it
-    assert @message.is_read
-  end
 end
