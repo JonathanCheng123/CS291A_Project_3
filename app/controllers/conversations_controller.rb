@@ -61,7 +61,7 @@ class ConversationsController < ApplicationController
       createdAt: conversation.created_at.iso8601,
       updatedAt: conversation.updated_at.iso8601,
       lastMessageAt: conversation.last_message_at&.iso8601,
-      unreadCount: 0 # Placeholder for unread count logic
+      unreadCount: conversation.unread_messages_for(current_user_from_token)
     }
   end
 end
