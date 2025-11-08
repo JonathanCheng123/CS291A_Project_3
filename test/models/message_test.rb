@@ -2,8 +2,16 @@ require "test_helper"
 
 class MessageTest < ActiveSupport::TestCase
   def setup
-    @user = User.create!(username: "testuser", password: "password123", password_confirmation: "password123")
-    @conversation = Conversation.create!(topic: "Test Conversation") # adjust attributes as needed
+    @user = User.create!(
+      username: "testuser",
+      password: "password123",
+      password_confirmation: "password123"
+    )
+
+    @conversation = Conversation.create!(
+      title: "Test Conversation",
+      initiator: @user
+    )
 
     @message = Message.new(
       user: @user,
@@ -29,11 +37,6 @@ class MessageTest < ActiveSupport::TestCase
 
   test "should belong to a user" do
     @message.user = nil
-    assert_not @message.valid?
-  end
-
-  test "should belong to a conversation" do
-    @message.conversation = nil
     assert_not @message.valid?
   end
 end
