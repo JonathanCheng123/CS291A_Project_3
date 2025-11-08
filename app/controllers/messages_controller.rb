@@ -3,6 +3,7 @@ class MessagesController < ApplicationController
   
     before_action :authenticate_with_jwt!
     before_action :set_conversation, only: [:index, :create]
+    before_action :authorize_conversation!, only: [:create, :read]
     before_action :set_message, only: [:read]
   
     # GET /conversations/:conversation_id/messages
@@ -49,9 +50,12 @@ class MessagesController < ApplicationController
   
     def set_conversation
       @conversation = Conversation.find(params[:conversationId] || params[:conversation_id])
+    end
+
+    def authorize_conversation!
       unless @conversation.initiator_id == current_user_from_token.id || 
              @conversation.assigned_expert_id == current_user_from_token.id
-        return render json: { error: 'Unauthorized' }, status: :forbidden
+        render json: { error: 'Unauthorized' }, status: :forbidden
       end
     end
   

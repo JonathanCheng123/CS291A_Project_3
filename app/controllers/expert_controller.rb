@@ -64,15 +64,17 @@ class ExpertController < ApplicationController
       render json: profile_response(current_expert.expert_profile)
     end
   
-    # PUT/PATCH /expert/profile
+    # PUT /expert/profile
     def update_profile
-      profile = current_expert.expert_profile
-  
-      if profile.update(profile_params)
-        render json: profile_response(profile)
-      else
-        render json: { errors: profile.errors.full_messages }, status: :unprocessable_entity
-      end
+        profile = current_expert.expert_profile
+        # Map camelCase keys from frontend to Rails snake_case
+        params[:knowledge_base_links] = params.delete(:knowledgeBaseLinks) if params[:knowledgeBaseLinks]
+      
+        if profile.update(profile_params)
+          render json: profile_response(profile)
+        else
+          render json: { errors: profile.errors.full_messages }, status: :unprocessable_entity
+        end
     end
   
     # GET /expert/assignments/history
