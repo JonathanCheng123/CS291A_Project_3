@@ -9,6 +9,7 @@ class AuthController < ApplicationController
     user = User.new(user_params)
     
     if user.save
+      ExpertProfile.create!(user_id: user.id)
       set_session(user)
       user.update!(last_active_at: Time.current)
       token = generate_token(user)

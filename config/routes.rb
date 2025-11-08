@@ -32,14 +32,14 @@ Rails.application.routes.draw do
     end
   end
 
-  namespace :expert do
-    get 'queue'
-    post 'conversations/:conversation_id/claim', to: 'conversations#claim'
-    post 'conversations/:conversation_id/unclaim', to: 'conversations#unclaim'
-    resource :profile, only: [:show, :update]
-    namespace :assignments do
-      get 'history'
-    end
+  scope :expert do
+    get 'queue', to: 'expert#queue'
+    post 'conversations/:conversation_id/claim', to: 'expert#claim'
+    post 'conversations/:conversation_id/unclaim', to: 'expert#unclaim'
+    get 'profile', to: 'expert#show_profile'
+    put 'profile', to: 'expert#update_profile'
+    patch 'profile', to: 'expert#update_profile'
+    get 'assignments/history', to: 'expert#assignment_history'
   end
 
   namespace :api do
