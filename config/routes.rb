@@ -7,4 +7,16 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  # health controller
+  get '/health', to: 'health#show'
+
+  # auth controller
+  scope :auth do
+    post '/register', to: 'auth#register'
+    post '/login', to: 'auth#login'
+    post '/logout', to: 'auth#logout'
+    post '/refresh', to: 'auth#refresh'
+    get '/me', to: 'auth#me'
+  end
 end
