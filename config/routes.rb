@@ -24,4 +24,27 @@ Rails.application.routes.draw do
   resources :conversations, only: [:index, :show, :create] do
     resources :messages, only: [:index]
   end
+
+  # messages controller
+  resources :messages, only: [:create] do
+    member do
+      put 'read'
+    end
+  end
+
+  namespace :expert do
+    get 'queue'
+    post 'conversations/:conversation_id/claim', to: 'conversations#claim'
+    post 'conversations/:conversation_id/unclaim', to: 'conversations#unclaim'
+    resource :profile, only: [:show, :update]
+    namespace :assignments do
+      get 'history'
+    end
+  end
+
+  namespace :api do
+    get 'conversations/updates', to: 'updates#conversations'
+    get 'messages/updates', to: 'updates#messages'
+    get 'expert-queue/updates', to: 'updates#expert_queue'
+  end
 end
