@@ -19,4 +19,9 @@ Rails.application.routes.draw do
     post '/refresh', to: 'auth#refresh'
     get '/me', to: 'auth#me'
   end
+
+  # conversations controller
+  resources :conversations, only: [:index, :show, :create] do
+    resources :messages, only: [:index]
+  end
 end
