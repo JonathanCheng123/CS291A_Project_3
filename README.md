@@ -1,24 +1,62 @@
-# README
+# Help Desk Backend - Rails API Setup
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This README provides instructions to set up the Help Desk Backend Rails API inside a Docker development environment.
 
-Things you may want to cover:
+---
 
-* Ruby version
+## 1. Start the Development Environment
 
-* System dependencies
+```bash
+docker-compose up -d
+```
 
-* Configuration
+## 2. Access the rails container
 
-* Database creation
+```bash
+docker-compose exec web bash
+```
 
-* Database initialization
+## 3. Install Rails if not already installed
 
-* How to run the test suite
+```bash
+gem install rails
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+## 4. Install dependencies
 
-* Deployment instructions
+```bash
+bundle install
+```
 
-* ...
+## 5. Create the database
+
+```bash
+cd help_desk_backend
+rails db:create
+```
+
+## 6. Start the Rails Server
+
+```bash
+rails server -b 0.0.0.0 -p 3000
+```
+
+# To run tests:
+
+## Test Requests and Services
+
+```bash
+bin/rails test test/requests/ test/services/
+```
+
+## Test Models
+
+```bash
+bin/rails test test/models
+```
+
+## Test Controllers
+
+```bash
+bin/rails test test/controllers
+```
