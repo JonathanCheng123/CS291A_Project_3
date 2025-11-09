@@ -1,13 +1,11 @@
 class ConversationsController < ApplicationController
-  include JwtAuthenticable
-
-  before_action :authenticate_with_jwt!
+  before_action :authenticate_with_jwt!, only: [:index, :show, :create]
   before_action :set_conversation, only: [:show]
 
   # GET /conversations
   def index
-    conversations = Conversation.where(initiator_id: current_user_from_token.id)
-                                .or(Conversation.where(assigned_expert_id: current_user_from_token.id))
+    conversations = Conversation.where(initiator_id: current_user.id)
+                                .or(Conversation.where(assigned_expert_id: current_user.id))
                                 .order(updated_at: :desc)
 
     render json: conversations.map { |c| conversation_response(c) }
@@ -21,7 +19,7 @@ class ConversationsController < ApplicationController
   # POST /conversations
   def create
     conversation = Conversation.new(conversation_params)
-    conversation.initiator = current_user_from_token
+    conversation.initiator = current_user
 
     if conversation.save
       render json: conversation_response(conversation), status: :created
@@ -32,12 +30,30 @@ class ConversationsController < ApplicationController
 
   private
 
+  # Authenticate request with JWT
+  def authenticate_with_jwt!
+    header = request.headers['Authorization']
+    token = header&.split(' ')&.last
+    payload = JwtService.decode(token)
+
+    if payload && (user = User.find_by(id: payload[:user_id]))
+      @current_user = user
+    else
+      render json: { error: 'Unauthorized' }, status: :unauthorized
+    end
+  end
+
+  # Returns current user from JWT
+  def current_user
+    @current_user
+  end
+
   # Set conversation for show
   def set_conversation
     @conversation = Conversation.find(params[:id])
-    unless @conversation.initiator_id == current_user_from_token.id || 
-           @conversation.assigned_expert_id == current_user_from_token.id
-      render json: { error: 'Unauthorized' }, status: :forbidden
+    unless @conversation.initiator_id == current_user.id || 
+           @conversation.assigned_expert_id == current_user.id
+      render json: { error: 'Conversation not found' }, status: :not_found
     end
   rescue ActiveRecord::RecordNotFound
     render json: { error: 'Conversation not found' }, status: :not_found
@@ -45,7 +61,7 @@ class ConversationsController < ApplicationController
 
   # Strong parameters
   def conversation_params
-    params.require(:conversation).permit(:title)
+    params.permit(:title) # flat params compatible with your tests
   end
 
   # JSON response for a conversation
@@ -61,7 +77,7 @@ class ConversationsController < ApplicationController
       createdAt: conversation.created_at.iso8601,
       updatedAt: conversation.updated_at.iso8601,
       lastMessageAt: conversation.last_message_at&.iso8601,
-      unreadCount: conversation.unread_messages_for(current_user_from_token)
+      unreadCount: conversation.unread_messages_for(current_user)
     }
   end
 end

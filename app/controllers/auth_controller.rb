@@ -1,23 +1,18 @@
 class AuthController < ApplicationController
   include SessionAuthenticable
-  include JwtAuthenticable
 
-#   skip_before_action :verify_authenticity_token, only: [:register, :login]
-  before_action :authenticate_with_session!, only: [:logout, :refresh, :me]
+  before_action :authenticate_with_session!, only: [:refresh, :me]
 
   def register
     user = User.new(user_params)
     
     if user.save
       ExpertProfile.create!(user_id: user.id)
-      set_session(user)
+      session[:user_id] = user.id
       user.update!(last_active_at: Time.current)
-      token = generate_token(user)
+      token = JwtService.encode(user)
       
-      render json: {
-        user: user_response(user),
-        token: token
-      }, status: :created
+      render json: { user: user_response(user), token: token }, status: :created
     else
       render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
     end
@@ -25,35 +20,29 @@ class AuthController < ApplicationController
 
   def login
     user = User.find_by(username: params[:username])
-
     if user&.authenticate(params[:password])
-      set_session(user)
+      ActiveRecord::SessionStore::Session.delete_all
+      session[:user_id] = user.id
       user.update!(last_active_at: Time.current)
-      token = generate_token(user)
+      token = JwtService.encode(user)
       
-      render json: {
-        user: user_response(user),
-        token: token
-      }
+      render json: { user: user_response(user), token: token }
     else
       render json: { error: 'Invalid username or password' }, status: :unauthorized
     end
   end
 
   def logout
-    clear_session
+    reset_session
     render json: { message: 'Logged out successfully' }
   end
 
   def refresh
     user = current_user_from_session
     user.update!(last_active_at: Time.current)
-    token = generate_token(user)
+    token = JwtService.encode(user)
     
-    render json: {
-      user: user_response(user),
-      token: token
-    }
+    render json: { user: user_response(user), token: token }
   end
 
   def me
