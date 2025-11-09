@@ -5,10 +5,9 @@ This README provides instructions to set up the Help Desk Backend Rails API insi
 ## System Dependencies
 ```bash
 Ruby 3.4.5
-Docker & Docker Compose
+Docker Compose
 ```
 
-## S
 ---
 
 ## 1. Start the Development Environment
