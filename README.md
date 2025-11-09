@@ -2,6 +2,13 @@
 
 This README provides instructions to set up the Help Desk Backend Rails API inside a Docker development environment.
 
+## System Dependencies
+```bash
+Ruby 3.4.5
+Docker & Docker Compose
+```
+
+## S
 ---
 
 ## 1. Start the Development Environment
@@ -33,6 +40,7 @@ bundle install
 ```bash
 cd help_desk_backend
 rails db:create
+rails db:migrate
 ```
 
 ## 6. Start the Rails Server
